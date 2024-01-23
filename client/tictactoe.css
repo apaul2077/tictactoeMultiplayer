@@ -1,0 +1,71 @@
+:root{
+    --game-cell-width: 5rem;
+    --cell-padding: 0.8rem;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.overall-container{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.title-button-board-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-board{
+    display: grid;
+    grid-template-columns: var(--game-cell-width) var(--game-cell-width) var(--game-cell-width);
+    background-color: black;
+    column-gap: 0.2rem;
+    row-gap: 0.2rem; 
+}
+
+.c1, .c2, .c3,
+.c4, .c5, .c6,
+.c7, .c8, .c9{
+    width: var(--game-cell-width);
+    height: var(--game-cell-width);
+    padding: var(--cell-padding);
+    font-size: 2.3rem;
+    background-color: white;
+    border-style: none;
+}
+
+.c1, .c2, .c3,
+.c4, .c5, .c6,
+.c7, .c8, .c9:disabled{
+    color: black;
+}
+
+.reset-button{
+    font-size: 1rem;
+    margin: 1rem;
+    width: 100%;
+    height: 2.5rem;
+    background-color: white;
+    border-style: none;
+    border: 3px black solid;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.reset-button:hover{
+    color: white;
+    background-color: black;
+}
+
+.game-board-title{
+    margin: 1rem;
+    font-size: 1.5rem;
+}
