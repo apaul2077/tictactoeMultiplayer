@@ -22,8 +22,6 @@ function changeCellContent(index){
 
     if(gameBoard[xCoord][yCoord] === ''){
         gameBoard[xCoord][yCoord] = currentPlayer;
-        if(currentPlayer === 'X') currentPlayer = 'O';
-        else currentPlayer = 'X';
     }
 }
 
@@ -84,16 +82,16 @@ listOfCells.forEach((cellItem, index) => {
             gameBoardTitle.textContent = `${won} won`
 
             won = ''
-
-            // listOfCells.forEach(toDisable =>{
-            //     toDisable.disabled = true;
-            // })
+            listOfCells.forEach(cell => cell.disabled = true);
         }
 
         count++;
-        console.log(count);
         if(count === 9 && won === '') gameBoardTitle.textContent = `Draw`;
         cellItem.disabled = true;
+
+        clientSideSocket.emit("cell-clicked", currentPlayer, index)
+        if(currentPlayer === 'X') currentPlayer = 'O';
+        else currentPlayer = 'X';
     })
 })
 
