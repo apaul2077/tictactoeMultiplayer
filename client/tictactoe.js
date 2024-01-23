@@ -63,9 +63,17 @@ function updateGameBoardDOM(){
 //Fetch cell objects and push to list
 const clientSideSocket = io('http://localhost:3000');
 
+const roomJoinTextbox = document.querySelector('.room-join');
+const roomJoinButton = document.querySelector('.room-join-button');
 const gameBoardTitle = document.querySelector(".game-board-title");
 const resetButton = document.querySelector(".reset-button");
 let count = 0;
+let room = '';
+
+roomJoinButton.addEventListener('click', () => {
+    room = roomJoinTextbox.value;
+    console.log(room);
+})
 
 for(let i = 1; i <= 9; i++){
     const temp = document.querySelector(`.c${i}`);
