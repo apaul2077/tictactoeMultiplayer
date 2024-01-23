@@ -70,9 +70,15 @@ const resetButton = document.querySelector(".reset-button");
 let count = 0;
 let room = '';
 
+//Event listener to join button for joining through socket
 roomJoinButton.addEventListener('click', () => {
     room = roomJoinTextbox.value;
-    console.log(room);
+    clientSideSocket.emit("join-room-msg", room);
+})
+
+//Listening for the other player's moves
+clientSideSocket.on("player-made-move", (currentPlayer, index) => {
+    console.log(currentPlayer, index);
 })
 
 for(let i = 1; i <= 9; i++){
@@ -97,7 +103,7 @@ listOfCells.forEach((cellItem, index) => {
         if(count === 9 && won === '') gameBoardTitle.textContent = `Draw`;
         cellItem.disabled = true;
 
-        clientSideSocket.emit("cell-clicked", currentPlayer, index)
+        clientSideSocket.emit("cell-clicked", currentPlayer, index) //emit for every click
         if(currentPlayer === 'X') currentPlayer = 'O';
         else currentPlayer = 'X';
     })
