@@ -12,6 +12,9 @@ const gameBoard = [['', '', ''],
 let currentPlayer = 'X';
 let won = '';
 
+//Connect to server
+const clientSideSocket = io('http://localhost:3000');
+
 //JS Functions
 function indexToCoords(index){
     return {x: Math.floor(index/3), y: index - Math.floor(index/3) * 3};
@@ -80,14 +83,11 @@ function resetGame(){
 }
 
 
-
 //--------------------------------------------
 
 //Cody Body
-//To connect to server
-const clientSideSocket = io('http://localhost:3000');
-
 //Multiplayer functionality components
+const leaveRoomButton = document.querySelector('.leave-room');
 const serverChosenMoveText = document.querySelector('.server-chosen-move');
 const roomJoinTextbox = document.querySelector('.room-join');
 const roomJoinButton = document.querySelector('.room-join-button');
@@ -136,12 +136,11 @@ listOfCells.forEach((cellItem, index) => {
 //reset button
 resetButton.addEventListener("click", () => {
     resetGame();
-    clientSideSocket.emit('reset-game', room);
+    if(multiplayerSwitch) clientSideSocket.emit('reset-game', room);
 })
 
 //Event listener to join button for joining through socket
 roomJoinButton.addEventListener('click', () => {
-    resetGame();
     room = roomJoinTextbox.value;
     clientSideSocket.emit("join-room-msg", room);
     multiplayerSwitch = 1;
@@ -184,6 +183,7 @@ clientSideSocket.on("player-made-move", (index) => {
 
 //Listening to what the server alots the client with 
 clientSideSocket.on("server-chosen-move", (randomChoice) => {
+    resetGame();
     if(randomChoice === 1){
         serverChosenMove = 'X';
         serverChosenMoveText.textContent = `You play: ${serverChosenMove}`;
@@ -199,9 +199,30 @@ clientSideSocket.on("server-chosen-move", (randomChoice) => {
 });
 
 //Listening to whether opponent resets the game or not
-clientSideSocket.on('reset-game-initiated', () => resetGame())
+clientSideSocket.on('player-left', () => {
+    resetGame();
+    serverChosenMoveText.textContent = 'Local Play';
+    multiplayerSwitch = 0;
+    roomJoinButton.disabled = false;
+})
 
+clientSideSocket.on('joined-room', () => {
+    roomJoinButton.disabled = true;
+})
+
+
+clientSideSocket.on('reset-game-initiated', () => resetGame())
 clientSideSocket.on('second-player-joined', () => resetGame())
+
+leaveRoomButton.addEventListener('click', () => {
+    clientSideSocket.emit('leave', room);
+    roomJoinButton.disabled = false;
+})
+
+window.onbeforeunload = function() {
+    clientSideSocket.emit('leave', room);
+}
+window.onbeforeunload();
 
 
 // [].forEach.call(document.querySelectorAll("*"),function(a){a.style.outline="2px solid #"+(~~(Math.random()*(1<<24))).toString(16)})
