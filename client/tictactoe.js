@@ -106,6 +106,10 @@ for(let i = 1; i <= 9; i++){
     listOfCells.push(temp);
 }
 
+//At start, leave room is disabled 
+leaveRoomButton.disabled = true;
+
+
 //Add event listeners, which change the player and the content of the text
 listOfCells.forEach((cellItem, index) => {
     cellItem.addEventListener("click", () => {
@@ -144,6 +148,7 @@ roomJoinButton.addEventListener('click', () => {
     room = roomJoinTextbox.value;
     clientSideSocket.emit("join-room-msg", room);
     multiplayerSwitch = 1;
+    // leaveRoomButton.disabled = false;
 })
 
 //Listeners for multiplayer
@@ -204,19 +209,24 @@ clientSideSocket.on('player-left', () => {
     serverChosenMoveText.textContent = 'Local Play';
     multiplayerSwitch = 0;
     roomJoinButton.disabled = false;
+    leaveRoomButton.disabled = true;
 })
 
 clientSideSocket.on('joined-room', () => {
     roomJoinButton.disabled = true;
+    serverChosenMoveText.textContent = 'Waiting';
+    listOfCells.forEach(cellItem => cellItem.disabled = true);
+    leaveRoomButton.disabled = false;
 })
 
 
 clientSideSocket.on('reset-game-initiated', () => resetGame())
-clientSideSocket.on('second-player-joined', () => resetGame())
+//clientSideSocket.on('second-player-joined', () => resetGame())
 
 leaveRoomButton.addEventListener('click', () => {
     clientSideSocket.emit('leave', room);
     roomJoinButton.disabled = false;
+    leaveRoomButton.disabled = true;
 })
 
 window.onbeforeunload = function() {

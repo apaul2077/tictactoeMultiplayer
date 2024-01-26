@@ -29,11 +29,16 @@ myServer.on("connection", socket => {
             const randomChoice = randomPlayerMoveChoose();
             roomsList[room] = [[socketID, randomChoice]];
             socket.join(room);
-            myServer.to(roomsList[room][0][0]).emit('server-chosen-move', roomsList[room][0][1]);
+            //myServer.to(roomsList[room][0][0]).emit('server-chosen-move', roomsList[room][0][1]);
             myServer.to(roomsList[room][0][0]).emit('joined-room');
         }
         else if(roomPresent && roomsList[room].length < 2){
             let randomChoice;
+
+            myServer.to(roomsList[room][0][0]).emit('server-chosen-move', roomsList[room][0][1]);
+            //myServer.to(roomsList[room][0][0]).emit('second-player-joined');
+            myServer.to(socketID).emit('joined-room');
+
             if(roomsList[room][0][1] === 0){
                 randomChoice = 1;
                 roomsList[room].push([socketID, randomChoice]);
@@ -45,8 +50,6 @@ myServer.on("connection", socket => {
                 myServer.to(roomsList[room][1][0]).emit('server-chosen-move', roomsList[room][1][1]);
             }
             socket.join(room);
-            myServer.to(roomsList[room][0][0]).emit('second-player-joined');
-            myServer.to(roomsList[room][1][0]).emit('joined-room');
         }
         else if(roomPresent && roomsList[room].length === 2){
             console.log(`${room} is full. Can't join.`)
@@ -74,6 +77,12 @@ myServer.on("connection", socket => {
     })
 
     socket.on('leave', room => {
+        if(roomsList.length > 0){
+            roomsList[room].forEach((item) => {
+                let player = myServer.sockets.sockets.get(item[0]);
+                player.leave(room);
+            })
+        }
         myServer.to(room).emit('player-left');
         delete roomsList[room];
     })

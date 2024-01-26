@@ -114,6 +114,11 @@
     background-color: black;
 }
 
+.leave-room:disabled{
+    color: #8c8a8a;
+    background-color: white;
+}
+
 .game-board-title{
     margin: 1rem;
     font-size: 1.5rem;
