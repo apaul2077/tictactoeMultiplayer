@@ -199,9 +199,9 @@ clientSideSocket.on("server-chosen-move", (randomChoice) => {
 });
 
 //Listening to whether opponent resets the game or not
-clientSideSocket.on('reset-game-initiated', () => {
-    resetGame();
-})
+clientSideSocket.on('reset-game-initiated', () => resetGame())
+
+clientSideSocket.on('second-player-joined', () => resetGame())
 
 
 // [].forEach.call(document.querySelectorAll("*"),function(a){a.style.outline="2px solid #"+(~~(Math.random()*(1<<24))).toString(16)})

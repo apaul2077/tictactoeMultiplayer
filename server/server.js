@@ -29,21 +29,22 @@ myServer.on("connection", socket => {
             const randomChoice = randomPlayerMoveChoose();
             roomsList[room] = [[socketID, randomChoice]];
             socket.join(room);
-            myServer.to(socketID).emit('server-chosen-move', roomsList[room][0][1]);
+            myServer.to(roomsList[room][0][0]).emit('server-chosen-move', roomsList[room][0][1]);
         }
         else if(roomPresent && roomsList[room].length < 2){
             let randomChoice;
             if(roomsList[room][0][1] === 0){
                 randomChoice = 1;
                 roomsList[room].push([socketID, randomChoice]);
-                myServer.to(socketID).emit('server-chosen-move', roomsList[room][1][1]);
+                myServer.to(roomsList[room][1][0]).emit('server-chosen-move', roomsList[room][1][1]);
             }
             else{
                 randomChoice = 0;
                 roomsList[room].push([socketID, randomChoice]);
-                myServer.to(socketID).emit('server-chosen-move', roomsList[room][1][1]);
+                myServer.to(roomsList[room][1][0]).emit('server-chosen-move', roomsList[room][1][1]);
             }
             socket.join(room);
+            myServer.to(roomsList[room][0][0]).emit('second-player-joined');
         }
         else if(roomPresent && roomsList[room].length === 2){
             console.log(`${room} is full. Can't join.`)
