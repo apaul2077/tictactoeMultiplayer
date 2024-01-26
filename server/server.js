@@ -29,19 +29,19 @@ myServer.on("connection", socket => {
             const randomChoice = randomPlayerMoveChoose();
             roomsList[room] = [[socketID, randomChoice]];
             socket.join(room);
-            myServer.to(socketID).emit('server-chosen-move', randomChoice);
+            myServer.to(socketID).emit('server-chosen-move', roomsList[room][0][1]);
         }
         else if(roomPresent && roomsList[room].length < 2){
             let randomChoice;
             if(roomsList[room][0][1] === 0){
                 randomChoice = 1;
                 roomsList[room].push([socketID, randomChoice]);
-                myServer.to(socketID).emit('server-chosen-move', randomChoice);
+                myServer.to(socketID).emit('server-chosen-move', roomsList[room][1][1]);
             }
             else{
                 randomChoice = 0;
                 roomsList[room].push([socketID, randomChoice]);
-                myServer.to(socketID).emit('server-chosen-move', randomChoice);
+                myServer.to(socketID).emit('server-chosen-move', roomsList[room][1][1]);
             }
             socket.join(room);
         }
@@ -58,8 +58,16 @@ myServer.on("connection", socket => {
     })
 
     //Listening whether client has resetted the game or not
-    socket.on('reset', () => {
+    socket.on('reset-game', (room) => {
         socket.to(room).emit('reset-game-initiated');
+        roomsList[room][0][1] = randomPlayerMoveChoose();
+
+        if(roomsList[room][0][1] === 0) roomsList[room][1][1] = 1;
+        else roomsList[room][1][1] = 0;
+
+        console.log(roomsList);
+        myServer.to(roomsList[room][0][0]).emit('server-chosen-move', roomsList[room][0][1]);
+        myServer.to(roomsList[room][1][0]).emit('server-chosen-move', roomsList[room][1][1])
     })
 })
 

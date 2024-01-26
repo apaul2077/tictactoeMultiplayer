@@ -79,6 +79,10 @@ function resetGame(){
     })
 }
 
+
+
+//--------------------------------------------
+
 //Cody Body
 //To connect to server
 const clientSideSocket = io('http://localhost:3000');
@@ -110,11 +114,10 @@ listOfCells.forEach((cellItem, index) => {
         checkWin();
         if(won){
             gameBoardTitle.textContent = `${won} won`
-
-            won = ''
             listOfCells.forEach(cell => cell.disabled = true);
         }   
 
+        console.log(count);
         count++;
         if(count === 9 && won === '') gameBoardTitle.textContent = `Draw`;
         cellItem.disabled = true;
@@ -153,17 +156,30 @@ clientSideSocket.on("player-made-move", (index) => {
     checkWin();
     if(won){
         gameBoardTitle.textContent = `${won} won`
-
-        won = ''
         listOfCells.forEach(cell => cell.disabled = true);
     }
 
+    console.log(count);
     count++;
     if(count === 9 && won === '') gameBoardTitle.textContent = `Draw`;
     listOfCells[index].disabled = true;
     if(currentPlayer === 'X') currentPlayer = 'O';
     else currentPlayer = 'X';
-    listOfCells.forEach(cellItem => cellItem.disabled = false);
+
+    if(!won){
+        for(let i = 0; i < 9; i++){
+            console.log(gameBoard[indexToCoords(i).x][indexToCoords(i).y]);
+            if(gameBoard[indexToCoords(i).x][indexToCoords(i).y] === ''){
+                listOfCells[i].disabled = false;
+            }
+            else{
+                listOfCells[i].disabled = true;
+            }
+        }
+    }
+    else{
+        listOfCells.forEach(cellItem => cellItem.disabled = true);
+    }
 });
 
 //Listening to what the server alots the client with 
@@ -183,7 +199,7 @@ clientSideSocket.on("server-chosen-move", (randomChoice) => {
 });
 
 //Listening to whether opponent resets the game or not
-clientSideSocket.on('reset-game-iniatiated', () => {
+clientSideSocket.on('reset-game-initiated', () => {
     resetGame();
 })
 
