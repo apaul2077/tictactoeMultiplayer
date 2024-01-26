@@ -7,7 +7,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto Mono', monospace;
 }
 
 .overall-container{
@@ -24,8 +24,45 @@
     align-items: center;
 }
 
+.multiplayer-components-container{
+    margin: 0.1rem;
+    width: 100%;
+    display: flex;
+}
+.room-join{
+    flex: 3;
+    height: 2.3rem;
+    border: 3px black solid;
+    padding: 0.4rem;
+    font-size: 1rem;
+    font-weight: 300;
+}
+
+.room-join:focus{
+    outline: none;
+}
+
+.room-join-button{
+    font-size: 1rem;
+    height: 2.3rem;
+    background-color: white;
+    border: 3px black solid;
+    border-left: 0;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.room-join-button:hover{
+    color: white;
+    background-color: black;
+}
+
+.room-join-button{
+    flex: 1;
+}
+
 .game-board{
     display: grid;
+    margin: 1rem;
     grid-template-columns: var(--game-cell-width) var(--game-cell-width) var(--game-cell-width);
     background-color: black;
     column-gap: 0.2rem;
@@ -35,27 +72,34 @@
 .c1, .c2, .c3,
 .c4, .c5, .c6,
 .c7, .c8, .c9{
+    font-weight: 100;
     width: var(--game-cell-width);
     height: var(--game-cell-width);
     padding: var(--cell-padding);
-    font-size: 2.3rem;
+    font-size: 2.5rem;
     background-color: white;
     border-style: none;
+    transition: background-color 0.15s;
 }
 
-.c1, .c2, .c3,
-.c4, .c5, .c6,
-.c7, .c8, .c9:disabled{
+.c1:disabled, .c2:disabled, .c3:disabled,
+.c4:disabled, .c5:disabled, .c6:disabled,
+.c7:disabled, .c8:disabled, .c9:disabled{
     color: black;
+}
+
+.c1:hover, .c2:hover, .c3:hover,
+.c4:hover, .c5:hover, .c6:hover,
+.c7:hover, .c8:hover, .c9:hover{    
+    background-color: #D3D3D3;
 }
 
 .reset-button{
     font-size: 1rem;
-    margin: 1rem;
+    margin: 0.1rem;
     width: 100%;
     height: 2.5rem;
     background-color: white;
-    border-style: none;
     border: 3px black solid;
     transition: background-color 0.15s, color 0.15s;
 }
@@ -68,4 +112,10 @@
 .game-board-title{
     margin: 1rem;
     font-size: 1.5rem;
+    font-weight: 100;
+}
+
+.server-chosen-move{
+    font-size: 1.2rem;
+    margin: 10px;
 }

@@ -58,29 +58,45 @@ function updateGameBoardDOM(){
     })
 }
 
+function resetGame(){
+    listOfCells.forEach((cellItem) => {
+        cellItem.textContent = ''
+    })
+
+    for(let i = 0; i < 3; i++){
+        for(let j = 0; j < 3; j++){
+            gameBoard[i][j] = '';
+        }
+    }
+
+    gameBoardTitle.textContent = 'MAKE A MOVE';
+    won = '';
+    currentPlayer = 'X';
+    count = 0;
+
+    listOfCells.forEach(toDisable =>{
+        toDisable.disabled = false;
+    })
+}
 
 //Cody Body
-//Fetch cell objects and push to list
+//To connect to server
 const clientSideSocket = io('http://localhost:3000');
 
+//Multiplayer functionality components
+const serverChosenMoveText = document.querySelector('.server-chosen-move');
 const roomJoinTextbox = document.querySelector('.room-join');
 const roomJoinButton = document.querySelector('.room-join-button');
+let room = '';  
+let serverChosenMove = '';
+let multiplayerSwitch = 0;
+
+//Actual game components
 const gameBoardTitle = document.querySelector(".game-board-title");
 const resetButton = document.querySelector(".reset-button");
-let count = 0;
-let room = '';
+let count = 0;          //count maintained to see if draw or not
 
-//Event listener to join button for joining through socket
-roomJoinButton.addEventListener('click', () => {
-    room = roomJoinTextbox.value;
-    clientSideSocket.emit("join-room-msg", room);
-})
-
-//Listening for the other player's moves
-clientSideSocket.on("player-made-move", (currentPlayer, index) => {
-    console.log(currentPlayer, index);
-})
-
+//Push DOM of cells to list
 for(let i = 1; i <= 9; i++){
     const temp = document.querySelector(`.c${i}`);
     listOfCells.push(temp);
@@ -97,36 +113,80 @@ listOfCells.forEach((cellItem, index) => {
 
             won = ''
             listOfCells.forEach(cell => cell.disabled = true);
-        }
+        }   
 
         count++;
         if(count === 9 && won === '') gameBoardTitle.textContent = `Draw`;
         cellItem.disabled = true;
 
-        clientSideSocket.emit("cell-clicked", currentPlayer, index) //emit for every click
+         //emit for every click
         if(currentPlayer === 'X') currentPlayer = 'O';
         else currentPlayer = 'X';
+
+        if(multiplayerSwitch){
+            listOfCells.forEach(cellItem => cellItem.disabled = true);
+            clientSideSocket.emit("cell-clicked", index, room);
+        }
     })
 })
 
+//reset button
 resetButton.addEventListener("click", () => {
-    listOfCells.forEach((cellItem) => {
-        cellItem.textContent = ''
-    })
+    resetGame();
+    clientSideSocket.emit('reset-game', room);
+})
 
-    for(let i = 0; i < 3; i++){
-        for(let j = 0; j < 3; j++){
-            gameBoard[i][j] = '';
-        }
+//Event listener to join button for joining through socket
+roomJoinButton.addEventListener('click', () => {
+    resetGame();
+    room = roomJoinTextbox.value;
+    clientSideSocket.emit("join-room-msg", room);
+    multiplayerSwitch = 1;
+})
+
+//Listeners for multiplayer
+//Listening for the other player's moves and making changes on my board 
+//because of opponent
+clientSideSocket.on("player-made-move", (index) => {
+    changeCellContent(index);
+    updateGameBoardDOM();
+    checkWin();
+    if(won){
+        gameBoardTitle.textContent = `${won} won`
+
+        won = ''
+        listOfCells.forEach(cell => cell.disabled = true);
     }
 
-    gameBoardTitle.textContent = 'Make a move';
-    won = '';
-    currentPlayer = 'X';
-    count = 0;
+    count++;
+    if(count === 9 && won === '') gameBoardTitle.textContent = `Draw`;
+    listOfCells[index].disabled = true;
+    if(currentPlayer === 'X') currentPlayer = 'O';
+    else currentPlayer = 'X';
+    listOfCells.forEach(cellItem => cellItem.disabled = false);
+});
 
-    listOfCells.forEach(toDisable =>{
-        toDisable.disabled = false;
-    })
+//Listening to what the server alots the client with 
+clientSideSocket.on("server-chosen-move", (randomChoice) => {
+    if(randomChoice === 1){
+        serverChosenMove = 'X';
+        serverChosenMoveText.textContent = `You play: ${serverChosenMove}`;
+    } 
+    else {
+        serverChosenMove = 'O'
+        serverChosenMoveText.textContent = `You play: ${serverChosenMove}`;
+    }
+
+    if(serverChosenMove === 'O'){
+        listOfCells.forEach(cellItem => cellItem.disabled = true);
+    }
+});
+
+//Listening to whether opponent resets the game or not
+clientSideSocket.on('reset-game-iniatiated', () => {
+    resetGame();
 })
+
+
+// [].forEach.call(document.querySelectorAll("*"),function(a){a.style.outline="2px solid #"+(~~(Math.random()*(1<<24))).toString(16)})
 

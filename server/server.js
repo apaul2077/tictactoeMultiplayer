@@ -4,16 +4,62 @@ const myServer = require('socket.io')(3000, {
     }
 })
 
+function randomPlayerMoveChoose(){
+    return Math.floor(Math.random() * 2);
+}
+
+let roomsList = {};
+
+//Player can join multiple rooms at the same time
+
 myServer.on("connection", socket => {
-    let currentRoom;
-    console.log(socket.id);
-    socket.on("cell-clicked", (currentPlayer, index) => {
-        socket.to(currentRoom).emit('player-made-move', currentPlayer, index);
-    })
+    const socketID = socket.id;
+    console.log(socketID);
+    
+    //Listening to the whether a client has joined room or not
     socket.on("join-room-msg", room => {
-        console.log(`${socket.id} joined.`)
-        socket.join(room);
-        currentRoom = room;
+        //Check if room is present or not
+        let roomPresent = false;
+        for(const eachRoom in roomsList){
+            if(room === eachRoom) roomPresent = true;
+        }
+
+        //Based on if its present add players appropriately to rooms
+        if(!roomPresent){
+            const randomChoice = randomPlayerMoveChoose();
+            roomsList[room] = [[socketID, randomChoice]];
+            socket.join(room);
+            myServer.to(socketID).emit('server-chosen-move', randomChoice);
+        }
+        else if(roomPresent && roomsList[room].length < 2){
+            let randomChoice;
+            if(roomsList[room][0][1] === 0){
+                randomChoice = 1;
+                roomsList[room].push([socketID, randomChoice]);
+                myServer.to(socketID).emit('server-chosen-move', randomChoice);
+            }
+            else{
+                randomChoice = 0;
+                roomsList[room].push([socketID, randomChoice]);
+                myServer.to(socketID).emit('server-chosen-move', randomChoice);
+            }
+            socket.join(room);
+        }
+        else if(roomPresent && roomsList[room].length === 2){
+            console.log(`${room} is full. Can't join.`)
+        }
+        console.log(roomsList);
+
+    })
+
+    //Listening to whether client has clicked a cell or not
+    socket.on("cell-clicked", (index, room) => {
+        socket.to(room).emit('player-made-move', index);
+    })
+
+    //Listening whether client has resetted the game or not
+    socket.on('reset', () => {
+        socket.to(room).emit('reset-game-initiated');
     })
 })
 
