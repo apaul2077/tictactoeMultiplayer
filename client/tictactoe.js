@@ -13,7 +13,7 @@ let currentPlayer = 'X';
 let won = '';
 
 //Connect to server
-const clientSideSocket = io('http://localhost:3000');
+const clientSideSocket = io('https://tic-tac-toe-multiplayer-epyb.onrender.com');
 
 //JS Functions
 function indexToCoords(index){
