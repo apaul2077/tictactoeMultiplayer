@@ -1,6 +1,9 @@
 const myServer = require('socket.io')(process.env.port || 3000, {
     cors: {
-        origin: ['http://localhost:8080','https://tic-tac-toe-multiplayer1439.netlify.app/']
+        origin: ['https://tic-tac-toe-multiplayer1439.netlify.app/', 'http://localhost:8080'],
+        methods: ["GET", "POST"],
+        allowedHeaders: ["Content-Type"],
+        credentials: true
     }
 })
 

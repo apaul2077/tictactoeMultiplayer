@@ -6,14 +6,25 @@ const listOfCells = [];
 
 //JS Variables
 const gameBoard = [['', '', ''], 
-                   ['', '', ''],
+                   ['', '', ''], 
                    ['', '', '']];
     
 let currentPlayer = 'X';
 let won = '';
 
 //Connect to server
-const clientSideSocket = io('https://tic-tac-toe-multiplayer-epyb.onrender.com');
+// const clientSideSocket = io('http://localhost:3000');
+// const clientSideSocket = io('http://localhost:3000', {
+//   cors: {
+//     origin: ["https://tic-tac-toe-multiplayer1439.netlify.app", "http://localhost:8080"],
+//     methods: ["GET", "POST"]
+//   }
+// });
+
+const clientSideSocket = io('https://tic-tac-toe-multiplayer-epyb.onrender.com', {
+    withCredentials: true,  // Important for cookies/session sharing (if needed)
+    transports: ['websocket'], // Specify transport to ensure compatibility
+  });
 
 //JS Functions
 function indexToCoords(index){
