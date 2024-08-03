@@ -22,20 +22,19 @@ let won = '';
 // });
 
 const clientSideSocket = io('https://tic-tac-toe-multiplayer-epyb.onrender.com', {
-    withCredentials: true,  // Important for cookies/session sharing (if needed)
-    transports: ['websocket'], // Specify transport to ensure compatibility
+    withCredentials: true,  
+    transports: ['websocket'], 
   });
 
 //JS Functions
 function indexToCoords(index){
-    return {x: Math.floor(index/3), y: index - Math.floor(index/3) * 3};
+    return {x: Math.floor(index/3), y: index%3};
 }
 function changeCellContent(index){
-    const xCoord = indexToCoords(index).x;
-    const yCoord = indexToCoords(index).y;
+    const coords = indexToCoords(index);
 
-    if(gameBoard[xCoord][yCoord] === ''){
-        gameBoard[xCoord][yCoord] = currentPlayer;
+    if(gameBoard[coords.x][coords.y] === ''){
+        gameBoard[coords.x][coords.y] = currentPlayer;
     }
 }
 
@@ -159,6 +158,7 @@ roomJoinButton.addEventListener('click', () => {
     room = roomJoinTextbox.value;
     clientSideSocket.emit("join-room-msg", room);
     multiplayerSwitch = 1;
+    roomJoinButton.disabled = true;
     // leaveRoomButton.disabled = false;
 })
 
@@ -200,6 +200,7 @@ clientSideSocket.on("player-made-move", (index) => {
 //Listening to what the server alots the client with 
 clientSideSocket.on("server-chosen-move", (randomChoice) => {
     resetGame();
+    resetButton.disabled = false;
     if(randomChoice === 1){
         serverChosenMove = 'X';
         serverChosenMoveText.textContent = `You play: ${serverChosenMove}`;
@@ -224,10 +225,11 @@ clientSideSocket.on('player-left', () => {
 })
 
 clientSideSocket.on('joined-room', () => {
-    roomJoinButton.disabled = true;
+    // roomJoinButton.disabled = true;
     serverChosenMoveText.textContent = 'Waiting';
     listOfCells.forEach(cellItem => cellItem.disabled = true);
     leaveRoomButton.disabled = false;
+    resetButton.disabled = true;
 })
 
 
@@ -238,6 +240,12 @@ leaveRoomButton.addEventListener('click', () => {
     clientSideSocket.emit('leave', room);
     roomJoinButton.disabled = false;
     leaveRoomButton.disabled = true;
+    resetButton.disabled = false;
+})
+
+clientSideSocket.on("error-joining-room", () => {
+    serverChosenMoveText.textContent = "Error!";
+    roomJoinButton.disabled = false;
 })
 
 window.onbeforeunload = function() {

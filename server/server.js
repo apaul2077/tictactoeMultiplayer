@@ -54,7 +54,8 @@ myServer.on("connection", socket => {
             }
             socket.join(room);
         }
-        else if(roomPresent && roomsList[room].length === 2){
+        else if((roomPresent && roomsList[room].length === 2) || room === ""){
+            myServer.to(socketID).emit("error-joining-room")
             console.log(`${room} is full. Can't join.`)
         }
         console.log(roomsList);

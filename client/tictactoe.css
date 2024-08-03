@@ -109,6 +109,11 @@
     transition: background-color 0.15s, color 0.15s;
 }
 
+.reset-button:disabled{
+    color: #8c8a8a;
+    background-color: white;
+}
+
 .reset-button:hover, .leave-room:hover{
     color: white;
     background-color: black;
