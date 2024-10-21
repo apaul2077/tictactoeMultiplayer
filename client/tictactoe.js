@@ -12,16 +12,16 @@ const gameBoard = [['', '', ''],
 let currentPlayer = 'X';
 let won = '';
 
-//Connect to server
-// const clientSideSocket = io('http://localhost:3000');
-// const clientSideSocket = io('http://localhost:3000', {
-//   cors: {
-//     origin: ["https://tic-tac-toe-multiplayer1439.netlify.app", "http://localhost:8080"],
-//     methods: ["GET", "POST"]
-//   }
-// });
+// Connect to server
+//server was at port 3000 but now it is at 2000
+// const clientSideSocket = io('http://localhost:2000');
 
-const clientSideSocket = io('https://tic-tac-toe-multiplayer-epyb.onrender.com', {
+// const clientSideSocket = io('http://localhost:2000', {
+//     withCredentials: true,  
+//     transports: ['websocket'], 
+//   });
+
+const clientSideSocket = io('https://ec2-13-232-193-192.ap-south-1.compute.amazonaws.com/', {
     withCredentials: true,  
     transports: ['websocket'], 
   });
@@ -92,6 +92,15 @@ function resetGame(){
     })
 }
 
+// Function to show the buffering animation
+function showBuffering() {
+    bufferingDiv.style.display = 'block';
+}
+
+// Function to hide the buffering animation
+function hideBuffering() {
+    bufferingDiv.style.display = 'none';
+}
 
 //--------------------------------------------
 
@@ -101,6 +110,8 @@ const leaveRoomButton = document.querySelector('.leave-room');
 const serverChosenMoveText = document.querySelector('.server-chosen-move');
 const roomJoinTextbox = document.querySelector('.room-join');
 const roomJoinButton = document.querySelector('.room-join-button');
+const bufferingDiv = document.getElementById('buffering');
+
 let room = '';  
 let serverChosenMove = '';
 let multiplayerSwitch = 0;
@@ -155,10 +166,21 @@ resetButton.addEventListener("click", () => {
 
 //Event listener to join button for joining through socket
 roomJoinButton.addEventListener('click', () => {
-    room = roomJoinTextbox.value;
-    clientSideSocket.emit("join-room-msg", room);
-    multiplayerSwitch = 1;
-    roomJoinButton.disabled = true;
+    if(roomJoinTextbox.value){
+        resetButton.disabled = true;
+        serverChosenMoveText.textContent = "Connecting"
+        showBuffering();
+        room = roomJoinTextbox.value;
+        clientSideSocket.emit("join-room-msg", room);
+        multiplayerSwitch = 1;
+        roomJoinButton.disabled = true;
+    }
+    else{
+        serverChosenMoveText.textContent = "Enter room!"
+        setTimeout(() => {
+            serverChosenMoveText.textContent = "Local Play"
+        }, 3000);
+    }
     // leaveRoomButton.disabled = false;
 })
 
@@ -226,6 +248,7 @@ clientSideSocket.on('player-left', () => {
 
 clientSideSocket.on('joined-room', () => {
     // roomJoinButton.disabled = true;
+    hideBuffering();
     serverChosenMoveText.textContent = 'Waiting';
     listOfCells.forEach(cellItem => cellItem.disabled = true);
     leaveRoomButton.disabled = false;

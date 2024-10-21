@@ -1,3 +1,4 @@
+//chnaged it to port 2000, it was at port 3000
 const myServer = require('socket.io')(process.env.port || 3000, {
     cors: {
         origin: ['https://tic-tac-toe-multiplayer1439.netlify.app/', 'http://localhost:8080'],
