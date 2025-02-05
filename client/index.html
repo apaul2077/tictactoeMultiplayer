@@ -11,12 +11,20 @@
     <body>
         <div class="overall-container">
             <div class="title-button-board-container">
+                <!-- Tabs for selecting mode -->
+                <div class="mode-tabs">
+                    <button class="tab-button active" data-mode="local">Local Play</button>
+                    <button class="tab-button" data-mode="multiplayer">Multiplayer</button>
+                    <button class="tab-button" data-mode="computer">Play Against Computer</button>
+                </div>
+
                 <div class="status">
                     <p class="server-chosen-move">Local Play</p>
                     <div id="buffering" class="buffering-container">
                         <span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
                     </div> 
                 </div>
+
                 <p class="game-board-title">MAKE A MOVE</p>
                 <div class="game-board">
                     <button class="c1"></button>
@@ -29,14 +37,17 @@
                     <button class="c8"></button>
                     <button class="c9"></button>
                 </div>
-                <div class="multiplayer-components-container">
-                    <input type="text" class="room-join">
+
+                <!-- Multiplayer components (Hidden by default) -->
+                <div class="multiplayer-components">
+                    <input type="text" class="room-join" placeholder="Enter room ID">
                     <button class="room-join-button">JOIN</button>
+                    <button class="leave-room">LEAVE ROOM</button>
                 </div>
-                <button class="leave-room">LEAVE ROOM</button>
+
                 <button class="reset-button">RESET</button>
             </div>
         </div>
         <script src="tictactoe.js" type="module"></script>
     </body>
-</html> 
+</html>
