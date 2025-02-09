@@ -63,6 +63,13 @@ myServer.on("connection", socket => {
 
     })
 
+    socket.on('chat-message', (message, room) => {
+        console.log(`Chat message from ${socketID} in room ${room}: ${message}`);
+        // Broadcast the chat message to everyone else in the room.
+        socket.to(room).emit('chat-message', message);
+    });
+
+
     //Listening to whether client has clicked a cell or not
     socket.on("cell-clicked", (index, room) => {
         socket.to(room).emit('player-made-move', index);
