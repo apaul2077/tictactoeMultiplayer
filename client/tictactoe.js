@@ -3,10 +3,16 @@ import { io } from 'socket.io-client';
 //------------------------------------
 // Socket Connection
 //------------------------------------
+// const clientSideSocket = io('https://tic-tac-toe-multiplayer-epyb.onrender.com', {
+//   withCredentials: true,
+//   transports: ['websocket'],
+// });
+
 const clientSideSocket = io('http://localhost:3000', {
   withCredentials: true,
   transports: ['websocket'],
 });
+
 
 
 //------------------------------------
@@ -222,6 +228,7 @@ function handleCellClick(index) {
   if (multiplayerSwitch) {
     if (!makeMove(index, myMarker)) return;
     clientSideSocket.emit("cell-clicked", index, room);
+    listOfCells.forEach(cell => {cell.disabled = true;})
   } 
   else {
     if (!makeMove(index, currentPlayer)) return;
@@ -229,16 +236,14 @@ function handleCellClick(index) {
     if (againstAI && checkWinner(gameBoard) === null && count < 9) {
       const bestMove = findBestMove();
       if (bestMove > -1) {
-        setTimeout(() => {
-          makeMove(bestMove, aiPlayer);
-          updateCellsAvailability();
-        }, 300);
+        makeMove(bestMove, aiPlayer);
+        updateCellsAvailability();
       }
     } else if (!againstAI && checkWinner(gameBoard) === null && count < 9) {
       togglePlayer();
     }
+    updateCellsAvailability();
   }
-  updateCellsAvailability();
 }
 
 
@@ -278,7 +283,7 @@ roomJoinButton.addEventListener('click', () => {
     roomJoinButton.disabled = true;
   } else {
     statusText.textContent = "Enter room!";
-    setTimeout(() => (statusText.textContent = "Local Play"), 3000);
+    setTimeout(() => (statusText.textContent = "Play Against Friend"), 3000);
   }
 });
 
@@ -300,12 +305,12 @@ gameModeDropdown.addEventListener('change', (e) => {
   // Update UI based on the new mode.
   if (newMode === 'local') {
     multiplayerComponents.style.display = 'none';
-    statusText.textContent = 'Local Play';
+    statusText.textContent = 'Play Against Friend';
     listOfCells.forEach(cell => cell.disabled = false);
     againstAI = false;
   } else if (newMode === 'multiplayer') {
     multiplayerComponents.style.display = 'flex';
-    statusText.textContent = 'Multiplayer - Enter Room';
+    statusText.textContent = 'Play Online - Enter Room';
     listOfCells.forEach(cell => cell.disabled = true);
     againstAI = false;
     // Chat remains hidden until the room is joined.
@@ -355,7 +360,7 @@ clientSideSocket.on("player-made-move", (index) => {
 clientSideSocket.on('joined-room', () => {
   hideBuffering();
   statusText.textContent = 'Waiting';
-  updateCellsAvailability();
+  // updateCellsAvailability();
   leaveRoomButton.disabled = false;
   resetButton.disabled = true;
   toggleChatVisibility(true);
@@ -365,13 +370,14 @@ clientSideSocket.on('joined-room', () => {
 clientSideSocket.on('player-left', () => {
   resetGame(); 
   if (currentMode !== 'multiplayer') return;
-  statusText.textContent = 'Multiplayer - Enter Room';
+  statusText.textContent = 'Play Online - Enter Room';
   multiplayerSwitch = 0;
   roomJoinButton.disabled = false;
   leaveRoomButton.disabled = true;
   resetButton.disabled = false;
   updateCellsAvailability();
   toggleChatVisibility(false);
+  listOfCells.forEach(cell => cell.disabled = true);
 });
 
 // When the opponent initiates a reset.
@@ -390,5 +396,9 @@ leaveRoomButton.addEventListener('click', () => {
 
 // Leave room when the page unloads.
 window.onbeforeunload = () => clientSideSocket.emit('leave', room);
+
+window.onload = () => {
+  gameModeDropdown.value = 'local';
+}
 
 // [].forEach.call(document.querySelectorAll("*"),function(a){a.style.outline="2px solid #"+(~~(Math.random()*(1<<24))).toString(16)})

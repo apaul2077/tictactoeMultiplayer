@@ -89,13 +89,13 @@ myServer.on("connection", socket => {
     })
 
     socket.on('leave', room => {
-        if(roomsList.length > 0){
+        myServer.to(room).emit('player-left');
+        if(Object.keys(roomsList).length > 0){
             roomsList[room].forEach((item) => {
                 let player = myServer.sockets.sockets.get(item[0]);
                 player.leave(room);
             })
         }
-        myServer.to(room).emit('player-left');
         delete roomsList[room];
     })
 })
