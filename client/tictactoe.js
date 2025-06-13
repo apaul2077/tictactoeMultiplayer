@@ -14,7 +14,6 @@ const clientSideSocket = io('http://localhost:3000', {
 });
 
 
-
 //------------------------------------
 // Global Variables & DOM Elements
 //------------------------------------
@@ -397,8 +396,14 @@ leaveRoomButton.addEventListener('click', () => {
 // Leave room when the page unloads.
 window.onbeforeunload = () => clientSideSocket.emit('leave', room);
 
-window.onload = () => {
-  gameModeDropdown.value = 'local';
-}
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    window.location.reload();
+  } else {
+    gameModeDropdown.value = 'local';
+  }
+});
+
+
 
 // [].forEach.call(document.querySelectorAll("*"),function(a){a.style.outline="2px solid #"+(~~(Math.random()*(1<<24))).toString(16)})
