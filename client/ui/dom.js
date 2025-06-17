@@ -1,0 +1,12 @@
+export const bufferingDiv = document.getElementById('buffering');
+export const gameBoardTitle = document.querySelector('.game-board-title');
+export const leaveRoomButton = document.querySelector('.leave-room');
+export const roomJoinTextbox = document.querySelector('.room-join');
+export const roomJoinButton = document.querySelector('.room-join-button');
+export const gameModeDropdown = document.getElementById('gameModeDropdown');
+export const multiplayerComponents = document.querySelector('.multiplayer-components');
+export const resetButton = document.querySelector('.reset-button');
+export const statusText = document.querySelector('.server-chosen-move');
+export const chatSection = document.getElementById('chatSection');
+export const chatInput = document.getElementById('chatInput');
+export const sendChatMessage = document.getElementById('sendChatMessage');
