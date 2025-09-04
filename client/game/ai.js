@@ -3,7 +3,6 @@ import { checkWinner } from './board.js';
 import { makeMove } from './board.js';
 import { updateCellsAvailability } from '../ui/helpers.js';
 import { gameBoard, currentPlayer, aiPlayer, count } from './state.js';
-import { findBestMove } from './ai.js'; 
 
 export function minimax(depth, isMaximizing, aiPlayer) {
   const result = checkWinner(gameBoard);

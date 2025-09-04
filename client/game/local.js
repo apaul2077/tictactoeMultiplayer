@@ -1,4 +1,3 @@
-// local.js
 import { makeMove, togglePlayer } from './board.js';
 import { updateCellsAvailability } from '../ui/helpers.js';
 import { gameBoard, currentPlayer, count } from './state.js';
